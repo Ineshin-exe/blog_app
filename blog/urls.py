@@ -10,6 +10,8 @@ urlpatterns = [
     path('post/<int:pk>/', PostDetail.as_view()),
     path('post/create/', PostCreate.as_view()),
     path('blogs/', BlogList.as_view()),
+    path('subscribe/', SubscribeForm.as_view()),
 
-    path('login/', LoginView.as_view()),
+    path('login/', Login.as_view()),
+    path('logout/', Logout.as_view()),
 ]

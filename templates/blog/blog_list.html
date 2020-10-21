@@ -2,10 +2,15 @@
 
 {% block content %}
     <h2>Blogs</h2>
+    <form method="post" action="">
+    {% csrf_token %}
     <ul>
         {% for blog in object_list %}
             <li>{{ blog.owner.username }}</li>
-            <button>follow</button>
+            <label>
+                <button type="submit" id="unsubscribe" name="blog_id" value="{{ blog.id }}"> follow/unfollow </button>
+            </label>
         {% endfor %}
     </ul>
+    </form>
 {% endblock %}
