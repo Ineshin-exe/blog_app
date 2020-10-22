@@ -6,7 +6,7 @@
     {% csrf_token %}
     <ul>
         {% for blog in object_list %}
-            <li>{{ blog.owner.username }}</li>
+            <li>{{ blog.author.username }}</li>
             <label>
                 {% if blog in subscriptions_blogs %}
                     <button type="submit" id="unsubscribe" name="blog_id" value="{{ blog.id }}">unfollow</button>

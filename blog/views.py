@@ -2,7 +2,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView
-from django.core.mail import send_mail
 
 from blog.models import Post, Blog
 
@@ -12,7 +11,7 @@ class PostList(LoginRequiredMixin, ListView):
     template_name = 'blog/post_list.html'
     
     def get_queryset(self):
-        return Post.objects.filter(blog=Blog.objects.get(owner=self.request.user))
+        return Post.objects.filter(blog=Blog.objects.get(author=self.request.user))
 
 
 class PostCreate(LoginRequiredMixin, CreateView):
@@ -24,7 +23,7 @@ class PostCreate(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         user = self.request.user
-        form.instance.blog = Blog.objects.get(owner=user)
+        form.instance.blog = Blog.objects.get(author=user)
         return super().form_valid(form)
 
 
@@ -76,7 +75,7 @@ class BlogList(LoginRequiredMixin, ListView):
         return context
 
     def get_queryset(self):
-        return Blog.objects.exclude(owner=self.request.user)
+        return Blog.objects.exclude(author=self.request.user)
 
     def post(self, request):
         user = self.request.user
