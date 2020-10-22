@@ -2,11 +2,14 @@
 
 {% block content %}
     <h2>Post</h2>
+    <h4>Title: {{ post.title }}</h4>
 
-    {{ post.title }} || {{ post.content }} || {{ post.created }}
+    <h4>Content:</h4>
+    {{ post.content }}
+    <h4>Created:</h4>
+    {{ post.created }}
 
-    <h5>{{ post.blog.author }}</h5>
-
+    <h4>Author: {{ post.blog.author }}</h4>
 
 {% endblock %}
 

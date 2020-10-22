@@ -4,7 +4,11 @@
     <h2>My posts</h2>
     <ul>
         {% for post in object_list %}
-            <li>{{ post.title }} || {{ post.content }} || {{ post.created }}</li>
+            <li>Title: {{ post.title }}
+                || Content:{{ post.content }}
+                || Created: {{ post.created }}
+                || Author: {{ post.blog.author  }}
+            </li>
         {% endfor %}
     </ul>
 {% endblock %}
