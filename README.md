@@ -18,6 +18,6 @@ Simple blog backend
 > $ docker-compose exec web python manage.py migrate
 
 5\. Create superuser:
-App required login to access to all pages. Create superuser and register new users.
+App requires login to access to all pages. Create superuser and register new users.
 
 > $ docker-compose exec web python manage.py createsuperuser
