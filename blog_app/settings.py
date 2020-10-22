@@ -48,8 +48,7 @@ ROOT_URLCONF = 'blog_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,4 +117,3 @@ EMAIL_USE_SSL = env('EMAIL_USE_SSL')
 
 # DOMAIN URL FOR SEND EMAILS
 SEND_EMAIL_SITE_URL = env('SEND_EMAIL_SITE_URL')
-
