@@ -1,13 +1,19 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <h2>Subscriptions</h2>
+    <h2>Feed</h2>
     <form method="post" action="">
     {% csrf_token %}
     <ul>
         {% for post in object_list %}
             <li>{{ post.title }} || {{ post.content }} || {{ post.created }}</li>
-            <button type="submit" name="post_id" value="{{ post.id }}"> read/unread </button>
+            <label>
+                {% if post in read_posts %}
+                    <button type="submit" name="post_id" value="{{ post.id }}">unread</button>
+                {% else %}
+                    <button type="submit" name="post_id" value="{{ post.id }}">read</button>
+                {% endif  %}
+            </label>
         {% endfor %}
     </ul>
     </form>

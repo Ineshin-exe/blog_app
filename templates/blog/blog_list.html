@@ -8,7 +8,11 @@
         {% for blog in object_list %}
             <li>{{ blog.owner.username }}</li>
             <label>
-                <button type="submit" id="unsubscribe" name="blog_id" value="{{ blog.id }}"> follow/unfollow </button>
+                {% if blog in subscriptions_blogs %}
+                    <button type="submit" id="unsubscribe" name="blog_id" value="{{ blog.id }}">unfollow</button>
+                {% else %}
+                    <button type="submit" id="unsubscribe" name="blog_id" value="{{ blog.id }}">follow</button>
+                {% endif  %}
             </label>
         {% endfor %}
     </ul>
