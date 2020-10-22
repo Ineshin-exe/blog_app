@@ -8,6 +8,9 @@ class Blog(models.Model):
     author = models.OneToOneField(User, on_delete=models.CASCADE, related_name='owner')
     subscribers = models.ManyToManyField(User, related_name='subscribers', blank=True)
 
+    class Meta:
+        ordering = ('author', )
+
     def __str__(self):
         return f"{self.author.username}'s blog"
 
