@@ -1,23 +1,30 @@
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 
 class Blog(models.Model):
-    owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, related_name='owner')
+    subscribers = models.ManyToManyField(User, related_name='subscribers', blank=True)
 
     def __str__(self):
         return f"{self.owner.username}'s blog"
 
 
 class Post(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='parent_blog')
     title = models.CharField(max_length=256)
     content = models.TextField()
     created = models.DateTimeField(default=timezone.now)
+    readers = models.ManyToManyField(User, related_name='post_readers')
+
+    def get_absolute_url(self):
+        return reverse("blog:post", args=(self.id,))
 
     class Meta:
-        ordering = ('-created', )
+        ordering = ('-created',)
 
     def __str__(self):
         return self.title

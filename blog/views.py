@@ -1,17 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, FormView
+from django.shortcuts import redirect
+from django.views.generic import ListView, DetailView, CreateView
+from django.core.mail import send_mail
 
-from blog.forms import FollowForm
 from blog.models import Post, Blog
-from profiles.models import Profile
 
 
 class PostList(LoginRequiredMixin, ListView):
     model = Post
+    template_name = 'blog/post_list.html'
     
     def get_queryset(self):
         return Post.objects.filter(blog=Blog.objects.get(owner=self.request.user))
@@ -19,6 +17,8 @@ class PostList(LoginRequiredMixin, ListView):
 
 class PostCreate(LoginRequiredMixin, CreateView):
     model = Post
+    template_name = 'blog/post_create.html'
+
     fields = ['title', 'content', ]
     success_url = '/posts/'
 
@@ -30,67 +30,78 @@ class PostCreate(LoginRequiredMixin, CreateView):
 
 class PostDetail(LoginRequiredMixin, DetailView):
     model = Post
+    template_name = 'blog/post_detail.html'
 
 
 class SubscriptionsList(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'blog/subscriptions_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['read_posts'] = Post.objects.filter(readers=self.request.user)
+        return context
+
     def get_queryset(self):
         user = self.request.user
-        profile = Profile.objects.get(user=user)
-        subscriptions = profile.subscriptions.all()
-        queryset = Post.objects.filter(blog__in=[blog for blog in subscriptions])
+        subscribed_blogs = Blog.objects.filter(subscribers=user)
+        queryset = Post.objects.filter(blog__in=[blog for blog in subscribed_blogs])
 
         return queryset
 
     def post(self, request):
         user = self.request.user
-        profile = Profile.objects.get(user=user)
+        read_posts = Post.objects.filter(readers=user)
 
         post_id = request.POST.get("post_id")
+        post = Post.objects.get(id=post_id)
 
-        print(post_id)
-
-        if Post.objects.get(id=post_id) not in profile.read.all():
-            profile.read.add(Post.objects.get(id=post_id))
-            profile.save()
+        if post not in read_posts.all():
+            post.readers.add(user)
+            post.save()
         else:
-            profile.read.remove(Post.objects.get(id=post_id))
-            profile.save()
+            post.readers.remove(user)
+            post.save()
 
         return redirect('/')
 
 
 class BlogList(LoginRequiredMixin, ListView):
     model = Blog
+    template_name = 'blog/blog_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['subscriptions_blogs'] = Blog.objects.filter(subscribers=self.request.user)
+        return context
 
     def get_queryset(self):
         return Blog.objects.exclude(owner=self.request.user)
 
     def post(self, request):
         user = self.request.user
-        profile = Profile.objects.get(user=user)
+        subscriptions_blogs = Blog.objects.filter(subscribers=user)
 
         blog_id = request.POST.get("blog_id")
+        blog = Blog.objects.get(id=blog_id)
 
-        if Blog.objects.get(id=blog_id) not in profile.subscriptions.all():
-            profile.subscriptions.add(Blog.objects.get(id=blog_id))
-            profile.save()
+        blog_posts = Post.objects.filter(blog=blog)
+
+        if blog not in subscriptions_blogs.all():
+            blog.subscribers.add(user)
+            blog.save()
         else:
-            profile.subscriptions.remove(Blog.objects.get(id=blog_id))
-            profile.save()
+            blog.subscribers.remove(user)
+            for post in blog_posts:
+                post.readers.remove(user)
+                post.save()
+            blog.save()
 
         return redirect('/blogs/')
 
 
-class SubscribeForm(LoginRequiredMixin, FormView):
-    form_class = FollowForm
-    template_name = "blog/subscribe_form.html"
-
-
 class Login(LoginView):
-    pass
+    template_name = 'registration/login.html'
 
 
 class Logout(LogoutView):
